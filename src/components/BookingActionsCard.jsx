@@ -87,7 +87,7 @@ export function BookingActionsCard({ booking, userRole = 'admin' }) {
 
   return (
     <div className="space-y-2">
-      {/* Botones de acción */}
+
       {canUpdateStatus && (
         <Button 
           className="w-full" 
@@ -130,7 +130,7 @@ export function BookingActionsCard({ booking, userRole = 'admin' }) {
         </Button>
       )}
 
-      {/* Dialog para cancelar reserva */}
+  
       <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

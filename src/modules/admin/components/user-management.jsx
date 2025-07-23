@@ -111,7 +111,7 @@ export function UserManagement({ users, roles, bulkActions }) {
               Nuevo Usuario
             </Button>
           </ProtectedComponent>
-          {/* Modal de Nuevo Usuario */}
+      
           <NewUserModal 
             isOpen={isNewUserModalOpen}
             onClose={() => setIsNewUserModalOpen(false)}

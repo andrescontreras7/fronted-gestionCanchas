@@ -116,11 +116,7 @@ export default function CourtCalendar({ canchaId, onSelectTimeSlot }) {
       });
     }
 
-    console.log('📊 Días generados:', { 
-      totalDays: days.length, 
-      availableDays: days.filter(d => d.isAvailable).length,
-      calendarDataLength: calendarData.length 
-    });
+  
 
     return days;
   };

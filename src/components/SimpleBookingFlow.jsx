@@ -17,18 +17,15 @@ export default function SimpleBookingFlow({ courtId }) {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  console.log('🏟️ SimpleBookingFlow recibió courtId:', courtId);
 
-  // Cargar datos de la cancha
+
   useEffect(() => {
     const loadCourtData = async () => {
       try {
-        console.log('🔍 Cargando datos de cancha:', courtId);
         const data = await getDetailsCourts(courtId);
-        console.log('✅ Datos de cancha cargados:', data);
         setCourtData(data);
       } catch (error) {
-        console.error('❌ Error cargando cancha:', error);
+        console.error(' Error cargando cancha:', error);
       } finally {
         setLoading(false);
       }
@@ -40,17 +37,14 @@ export default function SimpleBookingFlow({ courtId }) {
   }, [courtId]);
 
   const handleTimeSlotSelect = (timeSlot) => {
-    console.log('⏰ Slot de tiempo seleccionado:', timeSlot);
     setSelectedTimeSlot(timeSlot);
   };
 
   const handleConfirmBooking = () => {
-    console.log('📝 Redirigiendo a reservas');
     router.push('/user/bookings');
   };
 
   const handleCancelBooking = () => {
-    console.log('❌ Cancelando selección de horario');
     setSelectedTimeSlot(null);
   };
 
@@ -100,7 +94,7 @@ export default function SimpleBookingFlow({ courtId }) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+   
       <div className="flex items-center gap-4">
         <Link href="/user/courts">
           <Button variant="outline" size="sm">
@@ -117,7 +111,6 @@ export default function SimpleBookingFlow({ courtId }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Información de la cancha */}
         <div className="lg:col-span-1">
           <Card className="sticky top-4">
             <CardHeader>

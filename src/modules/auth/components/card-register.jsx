@@ -60,28 +60,28 @@ export function CardRegister({ onToggleLogin, onRegister, isLoading, error }) {
             <div className="grid gap-2">
               <Label htmlFor="name">Nombre </Label>
               <Input
+                id="username"
+                type="text"
+                placeholder="Apolo"
+                {...register('username')}
+                className={errors.username ? 'border-destructive' : ''}
+              />
+              {errors.username && (
+                <p className="text-sm text-destructive">{errors.username.message}</p>
+              )}
+            </div>
+
+             <div className="grid gap-2">
+              <Label htmlFor="last_name">Apellido</Label>
+              <Input
                 id="last_name"
                 type="text"
-                placeholder="Juan Pérez"
+                placeholder="calvo"
                 {...register('last_name')}
                 className={errors.last_name ? 'border-destructive' : ''}
               />
               {errors.last_name && (
                 <p className="text-sm text-destructive">{errors.last_name.message}</p>
-              )}
-            </div>
-
-             <div className="grid gap-2">
-              <Label htmlFor="lastname">Apellido</Label>
-              <Input
-                id="last_name"
-                type="text"
-                placeholder="Juan Pérez"
-                {...register('lastname')}
-                className={errors.lastname ? 'border-destructive' : ''}
-              />
-              {errors.lastname && (
-                <p className="text-sm text-destructive">{errors.lastname.message}</p>
               )}
             </div>
             

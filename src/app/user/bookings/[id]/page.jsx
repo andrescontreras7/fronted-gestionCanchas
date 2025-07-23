@@ -117,7 +117,6 @@ const BookingDetailPage = ({ params }) => {
 
   return (
     <div className="container mx-auto p-6 max-w-6xl space-y-6">
-      {/* Header con botón de regreso */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/user/bookings">
@@ -137,7 +136,7 @@ const BookingDetailPage = ({ params }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Contenido principal */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Información de la Reserva */}
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

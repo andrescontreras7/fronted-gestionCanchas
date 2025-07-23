@@ -19,27 +19,27 @@ function UserCourtsComponents({ courts }) {
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-2">{court.nombre}</h2>
+                  <h2 className="text-2xl uppercase font-semibold mb-2">{court.nombre}</h2>
                   {court.tipo_deporte && (
                     <Badge variant="secondary" className="mb-2">
                       {court.tipo_deporte}
                     </Badge>
                   )}
                   <div className="space-y-1">
-                    <div className="flex items-center text-gray-600">
+                    <div className="flex items-center  ">
                       <MapPin size={16} className="mr-2" />
                       <p className="text-sm">{court.ubicacion}</p>
                     </div>
                     
                     {court.precio_por_hora && (
-                      <div className="flex items-center text-gray-600">
+                      <div className="flex items-center  ">
                         <DollarSign size={16} className="mr-2" />
                         <p className="text-sm">${court.precio_por_hora}/hora</p>
                       </div>
                     )}
                     
                     {court.capacidad_jugadores && (
-                      <div className="flex items-center text-gray-600">
+                      <div className="flex items-center">
                         <Users size={16} className="mr-2" />
                         <p className="text-sm">Hasta {court.capacidad_jugadores} jugadores</p>
                       </div>
@@ -49,7 +49,7 @@ function UserCourtsComponents({ courts }) {
               </div>
               
               {court.descripcion && (
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                <p className=" text-sm mb-4 line-clamp-2">
                   {court.descripcion}
                 </p>
               )}

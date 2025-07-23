@@ -1,24 +1,38 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { getDetailsBookingByUser } from '@/lib/server-actions';
-import Link from 'next/link';
+import React, { useState, useEffect } from "react";
+import { getDetailsBookingByUser } from "@/lib/server-actions";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar, Clock, MapPin, Plus, Search, Filter, Eye } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Plus,
+  Search,
+  Filter,
+  Eye,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export default function UserBookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('date-desc');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("date-desc");
 
   useEffect(() => {
     loadBookings();
@@ -32,9 +46,7 @@ export default function UserBookingsPage() {
     setLoading(true);
     try {
       const data = await getDetailsBookingByUser();
-      console.log('📋 Estructura de datos recibida:', data);
       if (data && data.length > 0) {
-        console.log('📋 Primera reserva como ejemplo:', data[0]);
       }
       setBookings(data || []);
     } catch (error) {
@@ -47,31 +59,34 @@ export default function UserBookingsPage() {
 
   const filterAndSortBookings = () => {
     let filtered = [...bookings];
-
-    // Filtrar por término de búsqueda
     if (searchTerm) {
-      filtered = filtered.filter(booking => 
-        (booking.cancha?.nombre || booking.cancha_nombre || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (booking.cancha?.ubicacion || booking.cancha_ubicacion || '').toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (booking) =>
+          (booking.cancha?.nombre || booking.cancha_nombre || "")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          (booking.cancha?.ubicacion || booking.cancha_ubicacion || "")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
       );
     }
 
-    // Filtrar por estado
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(booking => booking.estado === statusFilter);
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((booking) => booking.estado === statusFilter);
     }
 
-    // Ordenar
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'date-asc':
+        case "date-asc":
           return new Date(a.fecha_inicio) - new Date(b.fecha_inicio);
-        case 'date-desc':
+        case "date-desc":
           return new Date(b.fecha_inicio) - new Date(a.fecha_inicio);
-        case 'court-name':
-          return (a.cancha?.nombre || a.cancha_nombre || '').localeCompare(b.cancha?.nombre || b.cancha_nombre || '');
-        case 'status':
-          return (a.estado || '').localeCompare(b.estado || '');
+        case "court-name":
+          return (a.cancha?.nombre || a.cancha_nombre || "").localeCompare(
+            b.cancha?.nombre || b.cancha_nombre || ""
+          );
+        case "status":
+          return (a.estado || "").localeCompare(b.estado || "");
         default:
           return 0;
       }
@@ -81,22 +96,22 @@ export default function UserBookingsPage() {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP'
+    return new Intl.NumberFormat("es-CL", {
+      style: "currency",
+      currency: "CLP",
     }).format(amount || 0);
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'confirmada':
-        return 'bg-green-100 text-green-700 border-green-200';
-      case 'pendiente':
-        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'cancelada':
-        return 'bg-red-100 text-red-700 border-red-200';
+      case "confirmada":
+        return "bg-green-100 text-green-700 border-green-200";
+      case "pendiente":
+        return "bg-yellow-100 text-yellow-700 border-yellow-200";
+      case "cancelada":
+        return "bg-red-100 text-red-700 border-red-200";
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+        return "bg-gray-100 text-gray-700 border-gray-200";
     }
   };
 
@@ -107,16 +122,16 @@ export default function UserBookingsPage() {
   const formatDateTime = (dateTimeString) => {
     const date = new Date(dateTimeString);
     return {
-      date: date.toLocaleDateString('es-ES', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+      date: date.toLocaleDateString("es-ES", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       }),
-      time: date.toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit'
-      })
+      time: date.toLocaleTimeString("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
   };
 
@@ -157,7 +172,7 @@ export default function UserBookingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+   
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Mis Reservas</h1>
@@ -184,7 +199,7 @@ export default function UserBookingsPage() {
             className="pl-9"
           />
         </div>
-        
+
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-full sm:w-40">
             <Filter className="h-4 w-4 mr-2" />
@@ -211,7 +226,6 @@ export default function UserBookingsPage() {
         </Select>
       </div>
 
-      {/* Estadísticas rápidas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -222,7 +236,7 @@ export default function UserBookingsPage() {
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-green-600">
-              {bookings.filter(b => b.estado === 'confirmada').length}
+              {bookings.filter((b) => b.estado === "confirmada").length}
             </div>
             <p className="text-xs text-muted-foreground">Confirmadas</p>
           </CardContent>
@@ -230,7 +244,11 @@ export default function UserBookingsPage() {
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-blue-600">
-              {bookings.filter(b => isUpcoming(b.fecha_inicio) && b.estado === 'confirmada').length}
+              {
+                bookings.filter(
+                  (b) => isUpcoming(b.fecha_inicio) && b.estado === "confirmada"
+                ).length
+              }
             </div>
             <p className="text-xs text-muted-foreground">Próximas</p>
           </CardContent>
@@ -238,7 +256,7 @@ export default function UserBookingsPage() {
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-yellow-600">
-              {bookings.filter(b => b.estado === 'pendiente').length}
+              {bookings.filter((b) => b.estado === "pendiente").length}
             </div>
             <p className="text-xs text-muted-foreground">Pendientes</p>
           </CardContent>
@@ -251,70 +269,91 @@ export default function UserBookingsPage() {
           {filteredBookings.map((booking) => {
             const dateTime = formatDateTime(booking.fecha_inicio);
             const endTime = formatDateTime(booking.fecha_fin);
-            
+
             return (
-            <Card key={booking.reserva_id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-3 flex-1">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-lg">
-                        {booking.cancha?.nombre || booking.cancha_nombre || `Cancha ${booking.cancha?.cancha_id || booking.cancha_id || 'S/N'}`}
-                      </h3>
-                      {isUpcoming(booking.fecha_inicio) && booking.estado === 'confirmada' && (
-                        <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">
-                          Próxima
-                        </Badge>
+              <Card
+                key={booking.reserva_id}
+                className="hover:shadow-md transition-shadow"
+              >
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-3 flex-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-lg">
+                          {booking.cancha?.nombre ||
+                            booking.cancha_nombre ||
+                            `Cancha ${
+                              booking.cancha?.cancha_id ||
+                              booking.cancha_id ||
+                              "S/N"
+                            }`}
+                        </h3>
+                        {isUpcoming(booking.fecha_inicio) &&
+                          booking.estado === "confirmada" && (
+                            <Badge
+                              variant="outline"
+                              className="text-blue-600 border-blue-200 bg-blue-50"
+                            >
+                              Próxima
+                            </Badge>
+                          )}
+                      </div>
+
+                      <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          <span>{dateTime.date}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          <span>
+                            {dateTime.time} - {endTime.time}
+                          </span>
+                        </div>
+                      </div>
+
+                      {(booking.cancha?.ubicacion ||
+                        booking.cancha_ubicacion) && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <MapPin className="h-4 w-4" />
+                          <span>
+                            {booking.cancha?.ubicacion ||
+                              booking.cancha_ubicacion}
+                          </span>
+                        </div>
                       )}
-                    </div>
-                    
-                    <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        <span>{dateTime.date}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4" />
-                        <span>{dateTime.time} - {endTime.time}</span>
-                      </div>
-                    </div>
 
-                    {(booking.cancha?.ubicacion || booking.cancha_ubicacion) && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4" />
-                        <span>{booking.cancha?.ubicacion || booking.cancha_ubicacion}</span>
-                      </div>
-                    )}
+                      {(booking.cancha?.tipo_deporte ||
+                        booking.cancha_tipo_deporte) && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Badge variant="outline">
+                            {booking.cancha?.tipo_deporte ||
+                              booking.cancha_tipo_deporte}
+                          </Badge>
+                        </div>
+                      )}
 
-                    {(booking.cancha?.tipo_deporte || booking.cancha_tipo_deporte) && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Badge variant="outline">
-                          {booking.cancha?.tipo_deporte || booking.cancha_tipo_deporte}
-                        </Badge>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between pt-2">
-                      <div className="text-lg font-semibold">
-                        {formatCurrency(booking.precio_total)}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge className={getStatusColor(booking.estado)}>
-                          {booking.estado || 'Confirmada'}
-                        </Badge>
-                        <Button asChild variant="outline" size="sm">
-                          <Link href={`/user/bookings/${booking.reserva_id}`}>
-                            <Eye className="h-4 w-4 mr-1" />
-                            Ver Detalles
-                          </Link>
-                        </Button>
+                      <div className="flex items-center justify-between pt-2">
+                        <div className="text-lg font-semibold">
+                          {formatCurrency(booking.precio_total)}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className={getStatusColor(booking.estado)}>
+                            {booking.estado || "Confirmada"}
+                          </Badge>
+                          <Button asChild variant="outline" size="sm">
+                            <Link href={`/user/bookings/${booking.reserva_id}`}>
+                              <Eye className="h-4 w-4 mr-1" />
+                              Ver Detalles
+                            </Link>
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
             );
           })}
         </div>
@@ -325,13 +364,14 @@ export default function UserBookingsPage() {
               <Calendar className="h-16 w-16 mx-auto text-muted-foreground" />
               <div>
                 <h3 className="text-xl font-medium">
-                  {bookings.length === 0 ? 'No tienes reservas' : 'No se encontraron reservas'}
+                  {bookings.length === 0
+                    ? "No tienes reservas"
+                    : "No se encontraron reservas"}
                 </h3>
                 <p className="text-muted-foreground">
-                  {bookings.length === 0 
-                    ? '¡Haz tu primera reserva y disfruta de nuestras canchas!'
-                    : 'Prueba ajustando los filtros de búsqueda'
-                  }
+                  {bookings.length === 0
+                    ? "¡Haz tu primera reserva y disfruta de nuestras canchas!"
+                    : "Prueba ajustando los filtros de búsqueda"}
                 </p>
               </div>
               {bookings.length === 0 && (

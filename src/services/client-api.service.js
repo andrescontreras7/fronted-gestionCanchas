@@ -56,7 +56,6 @@ async function authenticatedClientCall(endpoint, options = {}) {
 
 export const clientAuthService = {
   async login(credentials) {
-    console.log('🚀 Client Login:', credentials.email)
     
     const response = await clientApiCall('/auth/login', {
       method: 'POST',
@@ -83,7 +82,6 @@ export const clientAuthService = {
         if (roleFromJWT) {
           storage.setUserRole(roleFromJWT)
           roleSet = true
-          console.log('✅ Rol obtenido del JWT:', roleFromJWT)
         }
       } catch (error) {
         console.warn('No se pudo extraer rol del JWT:', error)
@@ -96,7 +94,6 @@ export const clientAuthService = {
           if (profile?.role?.name) {
             storage.setUserRole(profile.role.name)
             roleSet = true
-            console.log('✅ Rol obtenido del perfil:', profile.role.name)
           }
         } catch (error) {
           console.warn('No se pudo obtener el rol del perfil:', error)
@@ -106,7 +103,6 @@ export const clientAuthService = {
       // 3. Último fallback: rol por defecto
       if (!roleSet) {
         storage.setUserRole('usuario')
-        console.log('⚠️ Usando rol por defecto: usuario')
       }
     }
     
@@ -244,7 +240,7 @@ export const clientPermissionsService = {
 
 
 export function handleClientError(error) {
-  console.error('🚨 Client Error:', error)
+
   
   if (error.message.includes('401')) {
     storage.clearAuth()

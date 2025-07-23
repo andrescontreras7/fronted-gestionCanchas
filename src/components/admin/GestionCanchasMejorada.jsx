@@ -1,22 +1,40 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { getCourtsWithStats, updateCourtStatus, checkCourtFullAvailability, deleteCourt } from '@/lib/booking-actions';
+import React, { useState, useEffect } from "react";
+import {
+  getCourtsWithStats,
+  updateCourtStatus,
+  checkCourtFullAvailability,
+  deleteCourt,
+} from "@/lib/booking-actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  MapPin, 
-  Users, 
-  DollarSign, 
-  Clock, 
-  Plus, 
-  Settings, 
-  AlertTriangle, 
-  CheckCircle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  MapPin,
+  Users,
+  DollarSign,
+  Clock,
+  Plus,
+  Settings,
+  AlertTriangle,
+  CheckCircle,
   XCircle,
   Calendar,
   BarChart3,
@@ -25,32 +43,30 @@ import {
   Activity,
   Edit,
   Trash2,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { ProtectedComponent } from "@/components/ProtectedComponent";
-import { PERMISSIONS } from '@/lib/permissions';
-import Link from 'next/link';
+import { PERMISSIONS } from "@/lib/permissions";
+import Link from "next/link";
 
 const ESTADOS_CANCHA = {
-  'activa': { 
-    label: 'Activa', 
-    color: 'bg-green-100 text-green-800', 
-    icon: CheckCircle 
+  activa: {
+    label: "Activa",
+    color: "bg-green-100 text-green-800",
+    icon: CheckCircle,
   },
-  'inactiva': { 
-    label: 'Inactiva', 
-    color: 'bg-red-100 text-red-800', 
-    icon: XCircle 
-  }
+  inactiva: {
+    label: "Inactiva",
+    color: "bg-red-100 text-red-800",
+    icon: XCircle,
+  },
 };
 
-// Función para mapear el campo disponible a estados simples
 const mapearEstadoCancha = (cancha) => {
-  return cancha.disponible === true ? 'activa' : 'inactiva';
+  return cancha.disponible === true ? "activa" : "inactiva";
 };
 
-// Función para obtener la configuración de estado de una cancha
 const obtenerConfigEstado = (cancha) => {
   const estado = mapearEstadoCancha(cancha);
   return ESTADOS_CANCHA[estado];
@@ -65,43 +81,42 @@ export default function GestionCanchasMejorada() {
   const [canchaToDelete, setCanchaToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
-  const [newStatus, setNewStatus] = useState('');
+  const [newStatus, setNewStatus] = useState("");
 
-  // Cargar canchas con estadísticas
   const loadCanchas = async () => {
     setLoading(true);
     try {
-      console.log('🔄 Iniciando carga de canchas...');
       const data = await getCourtsWithStats();
-      console.log('📋 Canchas obtenidas:', data.length);
-      
-      // Verificar disponibilidad completa para cada cancha
-      console.log('🔍 Verificando disponibilidad para cada cancha...');
+
       const canchesWithAvailability = await Promise.all(
         data.map(async (cancha, index) => {
           try {
-            console.log(`📊 Procesando cancha ${index + 1}: ${cancha.nombre}`);
-            const availability = await checkCourtFullAvailability(cancha.cancha_id);
+            const availability = await checkCourtFullAvailability(
+              cancha.cancha_id
+            );
             return {
               ...cancha,
-              ...availability
+              ...availability,
             };
           } catch (error) {
-            console.error(`❌ Error procesando cancha ${cancha.nombre}:`, error);
+            console.error(` Error procesando cancha ${cancha.nombre}:`, error);
             return {
               ...cancha,
               tieneHorarios: false,
               tieneEspeciales: false,
-              estadoGeneral: 'error'
+              estadoGeneral: "error",
             };
           }
         })
       );
-      
-      console.log('✅ Canchas procesadas completamente:', canchesWithAvailability.length);
+
+      console.log(
+        " Canchas procesadas completamente:",
+        canchesWithAvailability.length
+      );
       setCanchas(canchesWithAvailability);
     } catch (error) {
-      console.error('❌ Error cargando canchas:', error);
+      console.error(" Error cargando canchas:", error);
       toast.error(`Error al cargar canchas: ${error.message}`);
     } finally {
       setLoading(false);
@@ -112,41 +127,40 @@ export default function GestionCanchasMejorada() {
     loadCanchas();
   }, []);
 
-  // Cambiar estado de cancha
   const handleStatusChange = async () => {
     if (!selectedCancha || !newStatus) {
-      toast.error('Por favor selecciona un estado válido');
+      toast.error("Por favor selecciona un estado válido");
       return;
     }
-    
+
     setUpdatingStatus(true);
     try {
-      console.log('🔄 Iniciando cambio de estado:', {
-        cancha_id: selectedCancha.cancha_id,
-        nombre: selectedCancha.nombre,
-        estadoActualMapeado: mapearEstadoCancha(selectedCancha),
-        disponibleActual: selectedCancha.disponible,
-        nuevoEstado: newStatus
-      });
+      const result = await updateCourtStatus(
+        selectedCancha.cancha_id,
+        newStatus
+      );
 
-      const result = await updateCourtStatus(selectedCancha.cancha_id, newStatus);
-      console.log('✅ Respuesta del servidor:', result);
-      
       const estadoAnterior = mapearEstadoCancha(selectedCancha);
       const estadoNuevo = newStatus;
-      
-      toast.success(`✅ Estado actualizado: "${estadoAnterior}" → "${newStatus === 'activa' ? 'Activa' : 'Inactiva'}" para ${selectedCancha.nombre}`);
-      
+
+      toast.success(
+        ` Estado actualizado: "${estadoAnterior}" → "${
+          newStatus === "activa" ? "Activa" : "Inactiva"
+        }" para ${selectedCancha.nombre}`
+      );
+
       setStatusDialogOpen(false);
       setSelectedCancha(null);
-      setNewStatus('');
-      
+      setNewStatus("");
+
       // Recargar datos para reflejar cambios
-      console.log('🔄 Recargando lista de canchas...');
+      console.log("🔄 Recargando lista de canchas...");
       await loadCanchas();
     } catch (error) {
-      console.error('❌ Error actualizando estado:', error);
-      toast.error(`Error al actualizar estado: ${error.message || 'Error desconocido'}`);
+      console.error("❌ Error actualizando estado:", error);
+      toast.error(
+        `Error al actualizar estado: ${error.message || "Error desconocido"}`
+      );
     } finally {
       setUpdatingStatus(false);
     }
@@ -155,21 +169,20 @@ export default function GestionCanchasMejorada() {
   // Eliminar cancha
   const handleDeleteCourt = async () => {
     if (!canchaToDelete) return;
-    
+
     setDeleting(true);
     try {
-      console.log('Eliminando cancha:', canchaToDelete.cancha_id);
-      
+      console.log("Eliminando cancha:", canchaToDelete.cancha_id);
+
       await deleteCourt(canchaToDelete.cancha_id);
-      toast.success(`✅ Cancha "${canchaToDelete.nombre}" eliminada exitosamente`);
-      
+      toast.success(`Cancha "${canchaToDelete.nombre}" eliminada exitosamente`);
+
       setDeleteDialogOpen(false);
       setCanchaToDelete(null);
-      
+
       // Recargar datos
       loadCanchas();
     } catch (error) {
-      console.error('Error eliminando cancha:', error);
       toast.error(`❌ Error al eliminar cancha: ${error.message}`);
     } finally {
       setDeleting(false);
@@ -178,19 +191,19 @@ export default function GestionCanchasMejorada() {
 
   // Determinar estado visual de la cancha (simplificado)
   const getCourtDisplayStatus = (cancha) => {
-    console.log('🔍 Estado de cancha:', cancha.nombre, {
+    console.log("🔍 Estado de cancha:", cancha.nombre, {
       disponible: cancha.disponible,
-      tieneHorarios: cancha.tieneHorarios
+      tieneHorarios: cancha.tieneHorarios,
     });
-    
+
     // Simplemente usar el campo disponible
-    return cancha.disponible === true ? 'activa' : 'inactiva';
+    return cancha.disponible === true ? "activa" : "inactiva";
   };
 
   // Determinar nivel de configuración
   const getConfigLevel = (cancha) => {
     let level = 0;
-    
+
     // Factores que determinan el nivel de configuración
     if (cancha.nombre && cancha.nombre.trim()) level += 20;
     if (cancha.descripcion && cancha.descripcion.trim()) level += 15;
@@ -198,7 +211,7 @@ export default function GestionCanchasMejorada() {
     if (cancha.precio_por_hora || cancha.precio_base) level += 15;
     if (cancha.disponible === true) level += 15; // Está activa
     if (cancha.tieneHorarios) level += 20;
-    
+
     return Math.min(level, 100);
   };
 
@@ -225,7 +238,7 @@ export default function GestionCanchasMejorada() {
             Dashboard completo con estados, estadísticas y configuración
           </p>
         </div>
-        
+
         <ProtectedComponent permissions={PERMISSIONS.CREAR_CANCHAS}>
           <Link href="/admin/courts/new">
             <Button className="flex items-center gap-2">
@@ -245,7 +258,7 @@ export default function GestionCanchasMejorada() {
               <div>
                 <p className="text-sm text-muted-foreground">Activas</p>
                 <p className="text-2xl font-bold">
-                  {canchas.filter(c => c.disponible === true).length}
+                  {canchas.filter((c) => c.disponible === true).length}
                 </p>
               </div>
             </div>
@@ -259,7 +272,7 @@ export default function GestionCanchasMejorada() {
               <div>
                 <p className="text-sm text-muted-foreground">Inactivas</p>
                 <p className="text-2xl font-bold">
-                  {canchas.filter(c => c.disponible === false).length}
+                  {canchas.filter((c) => c.disponible === false).length}
                 </p>
               </div>
             </div>
@@ -279,17 +292,19 @@ export default function GestionCanchasMejorada() {
         </Card>
       </div>
 
-      {/* Lista de Canchas */}
       {canchas.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {canchas.map(cancha => {
+          {canchas.map((cancha) => {
             const displayStatus = getCourtDisplayStatus(cancha);
             const statusConfig = ESTADOS_CANCHA[displayStatus];
             const StatusIcon = statusConfig.icon;
             const configLevel = getConfigLevel(cancha);
-            
+
             return (
-              <Card key={cancha.cancha_id} className="hover:shadow-lg transition-shadow">
+              <Card
+                key={cancha.cancha_id}
+                className="hover:shadow-lg transition-shadow"
+              >
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div>
@@ -302,26 +317,32 @@ export default function GestionCanchasMejorada() {
                           {statusConfig.label}
                         </Badge>
                         {(cancha.tipo || cancha.tipo_deporte) && (
-                          <Badge variant="outline">{cancha.tipo || cancha.tipo_deporte}</Badge>
+                          <Badge variant="outline">
+                            {cancha.tipo || cancha.tipo_deporte}
+                          </Badge>
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="text-right">
-                      <div className="text-sm text-muted-foreground">Configuración</div>
+                      <div className="text-sm text-muted-foreground">
+                        Configuración
+                      </div>
                       <div className="flex items-center gap-2">
                         <div className="w-16 bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="bg-blue-600 h-2 rounded-full transition-all" 
+                          <div
+                            className="bg-blue-600 h-2 rounded-full transition-all"
                             style={{ width: `${configLevel}%` }}
                           />
                         </div>
-                        <span className="text-sm font-medium">{configLevel}%</span>
+                        <span className="text-sm font-medium">
+                          {configLevel}%
+                        </span>
                       </div>
                     </div>
                   </div>
                 </CardHeader>
-                
+
                 <CardContent className="space-y-4">
                   {/* Información básica */}
                   <div className="grid grid-cols-2 gap-4 text-sm">
@@ -331,11 +352,13 @@ export default function GestionCanchasMejorada() {
                         <span>{cancha.ubicacion}</span>
                       </div>
                     )}
-                    
+
                     {(cancha.precio_base || cancha.precio_por_hora) && (
                       <div className="flex items-center gap-2">
                         <DollarSign className="h-4 w-4 text-muted-foreground" />
-                        <span>${cancha.precio_base || cancha.precio_por_hora}/hora</span>
+                        <span>
+                          ${cancha.precio_base || cancha.precio_por_hora}/hora
+                        </span>
                       </div>
                     )}
                   </div>
@@ -343,16 +366,26 @@ export default function GestionCanchasMejorada() {
                   {/* Estadísticas */}
                   <div className="grid grid-cols-3 gap-4 p-3 bg-muted rounded-lg">
                     <div className="text-center">
-                      <div className="text-lg font-bold">{cancha.totalReservas || 0}</div>
-                      <div className="text-xs text-muted-foreground">Reservas</div>
+                      <div className="text-lg font-bold">
+                        {cancha.totalReservas || 0}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Reservas
+                      </div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold">{cancha.horasReservadas || 0}</div>
+                      <div className="text-lg font-bold">
+                        {cancha.horasReservadas || 0}
+                      </div>
                       <div className="text-xs text-muted-foreground">Horas</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold">{cancha.ocupacionPromedio || 0}%</div>
-                      <div className="text-xs text-muted-foreground">Ocupación</div>
+                      <div className="text-lg font-bold">
+                        {cancha.ocupacionPromedio || 0}%
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Ocupación
+                      </div>
                     </div>
                   </div>
 
@@ -379,7 +412,10 @@ export default function GestionCanchasMejorada() {
                   {/* Acciones */}
                   <div className="flex gap-2 pt-2 border-t">
                     <ProtectedComponent permissions={PERMISSIONS.VER_CANCHAS}>
-                      <Link href={`/admin/courts/${cancha.cancha_id}`} className="flex-1">
+                      <Link
+                        href={`/admin/courts/${cancha.cancha_id}`}
+                        className="flex-1"
+                      >
                         <Button variant="outline" size="sm" className="w-full">
                           <Eye className="h-4 w-4 mr-1" />
                           Ver
@@ -387,7 +423,9 @@ export default function GestionCanchasMejorada() {
                       </Link>
                     </ProtectedComponent>
 
-                    <ProtectedComponent permissions={PERMISSIONS.EDITAR_CANCHAS}>
+                    <ProtectedComponent
+                      permissions={PERMISSIONS.EDITAR_CANCHAS}
+                    >
                       <Link href={`/admin/courts/${cancha.cancha_id}/edit`}>
                         <Button variant="outline" size="sm">
                           <Settings className="h-4 w-4" />
@@ -395,7 +433,9 @@ export default function GestionCanchasMejorada() {
                       </Link>
                     </ProtectedComponent>
 
-                    <ProtectedComponent permissions={PERMISSIONS.EDITAR_CANCHAS}>
+                    <ProtectedComponent
+                      permissions={PERMISSIONS.EDITAR_CANCHAS}
+                    >
                       <Link href={`/admin/courts/${cancha.cancha_id}/horarios`}>
                         <Button variant="outline" size="sm">
                           <Calendar className="h-4 w-4" />
@@ -403,14 +443,20 @@ export default function GestionCanchasMejorada() {
                       </Link>
                     </ProtectedComponent>
 
-                    <ProtectedComponent permissions={PERMISSIONS.EDITAR_CANCHAS}>
-                      <Button 
-                        variant="outline" 
+                    <ProtectedComponent
+                      permissions={PERMISSIONS.EDITAR_CANCHAS}
+                    >
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => {
-                          console.log('🎯 Abriendo diálogo para cancha:', cancha.nombre, cancha.cancha_id);
+                          console.log(
+                            "🎯 Abriendo diálogo para cancha:",
+                            cancha.nombre,
+                            cancha.cancha_id
+                          );
                           setSelectedCancha(cancha);
-                          setNewStatus(''); // Resetear estado
+                          setNewStatus(""); // Resetear estado
                           setStatusDialogOpen(true);
                         }}
                         title="Cambiar estado de la cancha"
@@ -420,9 +466,11 @@ export default function GestionCanchasMejorada() {
                       </Button>
                     </ProtectedComponent>
 
-                    <ProtectedComponent permissions={PERMISSIONS.ELIMINAR_CANCHAS}>
-                      <Button 
-                        variant="destructive" 
+                    <ProtectedComponent
+                      permissions={PERMISSIONS.ELIMINAR_CANCHAS}
+                    >
+                      <Button
+                        variant="destructive"
                         size="sm"
                         onClick={() => {
                           setCanchaToDelete(cancha);
@@ -442,9 +490,12 @@ export default function GestionCanchasMejorada() {
         <Card>
           <CardContent className="text-center py-12">
             <MapPin className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">No hay canchas registradas</h3>
+            <h3 className="text-lg font-medium mb-2">
+              No hay canchas registradas
+            </h3>
             <p className="text-muted-foreground mb-4">
-              Comienza creando tu primera cancha para empezar a gestionar reservas.
+              Comienza creando tu primera cancha para empezar a gestionar
+              reservas.
             </p>
             <ProtectedComponent permissions={PERMISSIONS.CREAR_CANCHAS}>
               <Link href="/admin/courts/new">
@@ -464,29 +515,37 @@ export default function GestionCanchasMejorada() {
           <DialogHeader>
             <DialogTitle>Cambiar Estado de Cancha</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div className="p-3 bg-muted rounded-lg">
-              <label className="text-sm font-medium text-muted-foreground">Cancha:</label>
+              <label className="text-sm font-medium text-muted-foreground">
+                Cancha:
+              </label>
               <p className="text-lg font-semibold">{selectedCancha?.nombre}</p>
-              
+
               {selectedCancha && (
                 <div className="mt-2">
-                  <label className="text-sm font-medium text-muted-foreground">Estado actual:</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Estado actual:
+                  </label>
                   <div className="flex items-center gap-2 mt-1">
-                    <Badge className={obtenerConfigEstado(selectedCancha).color}>
+                    <Badge
+                      className={obtenerConfigEstado(selectedCancha).color}
+                    >
                       {obtenerConfigEstado(selectedCancha).label}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
-                      (disponible: {selectedCancha.disponible ? 'Sí' : 'No'})
+                      (disponible: {selectedCancha.disponible ? "Sí" : "No"})
                     </span>
                   </div>
                 </div>
               )}
             </div>
-            
+
             <div>
-              <label className="text-sm font-medium mb-2 block">Nuevo Estado:</label>
+              <label className="text-sm font-medium mb-2 block">
+                Nuevo Estado:
+              </label>
               <Select value={newStatus} onValueChange={setNewStatus}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecciona un estado..." />
@@ -507,40 +566,49 @@ export default function GestionCanchasMejorada() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             {newStatus && newStatus !== mapearEstadoCancha(selectedCancha) && (
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-center gap-2 text-sm text-blue-700">
                   <AlertTriangle className="h-4 w-4" />
-                  <span>La cancha cambiará de "{mapearEstadoCancha(selectedCancha)}" a "{newStatus === 'activa' ? 'Activa' : 'Inactiva'}"</span>
+                  <span>
+                    La cancha cambiará de "{mapearEstadoCancha(selectedCancha)}"
+                    a "{newStatus === "activa" ? "Activa" : "Inactiva"}"
+                  </span>
                 </div>
               </div>
             )}
           </div>
-          
+
           <DialogFooter>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 setStatusDialogOpen(false);
-                setNewStatus('');
+                setNewStatus("");
               }}
             >
               Cancelar
             </Button>
-            <Button 
-              onClick={handleStatusChange} 
-              disabled={!newStatus || newStatus === mapearEstadoCancha(selectedCancha) || updatingStatus}
+            <Button
+              onClick={handleStatusChange}
+              disabled={
+                !newStatus ||
+                newStatus === mapearEstadoCancha(selectedCancha) ||
+                updatingStatus
+              }
             >
               {updatingStatus ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Actualizando...
                 </>
+              ) : !newStatus ? (
+                "Selecciona un estado"
+              ) : newStatus === mapearEstadoCancha(selectedCancha) ? (
+                "Sin cambios"
               ) : (
-                !newStatus ? 'Selecciona un estado' : 
-                newStatus === mapearEstadoCancha(selectedCancha) ? 'Sin cambios' : 
-                'Actualizar Estado'
+                "Actualizar Estado"
               )}
             </Button>
           </DialogFooter>
@@ -553,32 +621,35 @@ export default function GestionCanchasMejorada() {
           <DialogHeader>
             <DialogTitle>Confirmar Eliminación</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div className="flex items-center gap-3 p-4 bg-red-50 rounded-lg border border-red-200">
               <AlertTriangle className="h-6 w-6 text-red-600" />
               <div>
                 <h4 className="font-medium text-red-800">¿Estás seguro?</h4>
                 <p className="text-sm text-red-600">
-                  Esta acción no se puede deshacer y eliminará permanentemente la cancha.
+                  Esta acción no se puede deshacer y eliminará permanentemente
+                  la cancha.
                 </p>
               </div>
             </div>
-            
+
             {canchaToDelete && (
               <div>
-                <label className="text-sm font-medium">Cancha a eliminar:</label>
+                <label className="text-sm font-medium">
+                  Cancha a eliminar:
+                </label>
                 <p className="text-lg font-bold">{canchaToDelete.nombre}</p>
                 <p className="text-sm text-muted-foreground">
-                  Tipo: {canchaToDelete.tipo || canchaToDelete.tipo_deporte} | 
-                  Ubicación: {canchaToDelete.ubicacion || 'No especificada'}
+                  Tipo: {canchaToDelete.tipo || canchaToDelete.tipo_deporte} |
+                  Ubicación: {canchaToDelete.ubicacion || "No especificada"}
                 </p>
               </div>
             )}
-            
+
             <div className="flex gap-2 justify-end">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
                   setDeleteDialogOpen(false);
                   setCanchaToDelete(null);
@@ -587,8 +658,8 @@ export default function GestionCanchasMejorada() {
               >
                 Cancelar
               </Button>
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 onClick={handleDeleteCourt}
                 disabled={deleting}
               >
@@ -598,7 +669,7 @@ export default function GestionCanchasMejorada() {
                     Eliminando...
                   </>
                 ) : (
-                  'Eliminar Cancha'
+                  "Eliminar Cancha"
                 )}
               </Button>
             </div>

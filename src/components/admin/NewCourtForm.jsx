@@ -1,26 +1,31 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Plus, Loader2 } from "lucide-react";
-import Link from 'next/link';
+import Link from "next/link";
 
-export default function NewCourtForm({ 
-  formData, 
-  onInputChange, 
-  onSelectChange, 
-  onSubmit, 
-  saving 
+export default function NewCourtForm({
+  formData,
+  onInputChange,
+  onSelectChange,
+  onSubmit,
+  saving,
 }) {
   return (
     <div className="container mx-auto py-8 space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Nueva Cancha</h1>
@@ -28,7 +33,7 @@ export default function NewCourtForm({
             Crea una nueva cancha para tu complejo deportivo
           </p>
         </div>
-        
+
         <Link href="/admin/courts">
           <Button variant="outline">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -37,7 +42,6 @@ export default function NewCourtForm({
         </Link>
       </div>
 
-      {/* Formulario */}
       <Card>
         <CardHeader>
           <CardTitle>Información de la Cancha</CardTitle>
@@ -45,7 +49,6 @@ export default function NewCourtForm({
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Nombre */}
               <div className="space-y-2">
                 <Label htmlFor="nombre">Nombre de la Cancha *</Label>
                 <Input
@@ -58,10 +61,14 @@ export default function NewCourtForm({
                 />
               </div>
 
-              {/* Tipo de Deporte */}
               <div className="space-y-2">
                 <Label htmlFor="tipo_deporte">Tipo de Deporte *</Label>
-                <Select value={formData.tipo_deporte} onValueChange={(value) => onSelectChange('tipo_deporte', value)}>
+                <Select
+                  value={formData.tipo_deporte}
+                  onValueChange={(value) =>
+                    onSelectChange("tipo_deporte", value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecciona el deporte" />
                   </SelectTrigger>
@@ -76,7 +83,6 @@ export default function NewCourtForm({
                 </Select>
               </div>
 
-              {/* Ubicación */}
               <div className="space-y-2">
                 <Label htmlFor="ubicacion">Ubicación</Label>
                 <Input
@@ -88,9 +94,10 @@ export default function NewCourtForm({
                 />
               </div>
 
-              {/* Capacidad */}
               <div className="space-y-2">
-                <Label htmlFor="capacidad_jugadores">Capacidad de Jugadores</Label>
+                <Label htmlFor="capacidad_jugadores">
+                  Capacidad de Jugadores
+                </Label>
                 <Input
                   id="capacidad_jugadores"
                   name="capacidad_jugadores"
@@ -103,7 +110,6 @@ export default function NewCourtForm({
                 />
               </div>
 
-              {/* Precio */}
               <div className="space-y-2">
                 <Label htmlFor="precio_por_hora">Precio por Hora *</Label>
                 <Input
@@ -119,23 +125,28 @@ export default function NewCourtForm({
                 />
               </div>
 
-              {/* Estado inicial */}
               <div className="space-y-2">
                 <Label htmlFor="estado">Estado Inicial</Label>
-                <Select value={formData.estado} onValueChange={(value) => onSelectChange('estado', value)}>
+                <Select
+                  value={formData.estado}
+                  onValueChange={(value) => onSelectChange("estado", value)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecciona el estado inicial" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="configuracion">En Configuración</SelectItem>
+                    <SelectItem value="configuracion">
+                      En Configuración
+                    </SelectItem>
                     <SelectItem value="activa">Activa</SelectItem>
-                    <SelectItem value="mantenimiento">En Mantenimiento</SelectItem>
+                    <SelectItem value="mantenimiento">
+                      En Mantenimiento
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
-            {/* Descripción */}
             <div className="space-y-2">
               <Label htmlFor="descripcion">Descripción</Label>
               <Textarea
@@ -148,26 +159,22 @@ export default function NewCourtForm({
               />
             </div>
 
-            {/* Disponible */}
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="disponible"
                 name="disponible"
                 checked={formData.disponible}
-                onCheckedChange={(checked) => onSelectChange('disponible', checked)}
+                onCheckedChange={(checked) =>
+                  onSelectChange("disponible", checked)
+                }
               />
               <Label htmlFor="disponible">
                 Cancha disponible para reservas inmediatamente
               </Label>
             </div>
 
-            {/* Botones */}
             <div className="flex gap-4 pt-6 border-t">
-              <Button 
-                type="submit" 
-                disabled={saving}
-                className="flex-1"
-              >
+              <Button type="submit" disabled={saving} className="flex-1">
                 {saving ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -180,7 +187,7 @@ export default function NewCourtForm({
                   </>
                 )}
               </Button>
-              
+
               <Link href="/admin/courts">
                 <Button variant="outline" disabled={saving}>
                   Cancelar

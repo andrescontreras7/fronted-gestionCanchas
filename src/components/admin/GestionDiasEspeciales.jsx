@@ -44,7 +44,7 @@ export default function GestionDiasEspeciales({ canchaId, refreshTrigger }) {
   const loadDiasEspeciales = async () => {
     setLoading(true);
     try {
-      // Cargar días especiales de los próximos 6 meses
+     
       const fechaDesde = new Date().toISOString().split('T')[0];
       const fechaHasta = new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
       
@@ -68,7 +68,7 @@ export default function GestionDiasEspeciales({ canchaId, refreshTrigger }) {
   const handleCreateSpecialDay = async (dayData) => {
     try {
       await createSpecialDay(dayData);
-      toast.success('✅ Día especial creado');
+      toast.success('Día especial creado');
       setDialogOpen(false);
       loadDiasEspeciales();
     } catch (error) {
@@ -77,7 +77,7 @@ export default function GestionDiasEspeciales({ canchaId, refreshTrigger }) {
     }
   };
 
-  // Crear mantenimiento
+
   const handleCreateMaintenance = async (maintenanceData) => {
     try {
       await createMaintenancePeriod(
@@ -86,7 +86,7 @@ export default function GestionDiasEspeciales({ canchaId, refreshTrigger }) {
         maintenanceData.fechaFin, 
         maintenanceData.descripcion
       );
-      toast.success('✅ Período de mantenimiento creado');
+      toast.success(' Período de mantenimiento creado');
       setMaintenanceDialogOpen(false);
       loadDiasEspeciales();
     } catch (error) {
@@ -95,11 +95,10 @@ export default function GestionDiasEspeciales({ canchaId, refreshTrigger }) {
     }
   };
 
-  // Editar día especial
   const handleEditSpecialDay = async (dayData) => {
     try {
       await updateSpecialDay(editingDay.dia_especial_id, dayData);
-      toast.success('✅ Día especial actualizado');
+      toast.success(' Día especial actualizado');
       setDialogOpen(false);
       setEditingDay(null);
       loadDiasEspeciales();
@@ -109,13 +108,13 @@ export default function GestionDiasEspeciales({ canchaId, refreshTrigger }) {
     }
   };
 
-  // Eliminar día especial
+
   const handleDeleteSpecialDay = async (diaEspecialId) => {
     if (!confirm('¿Estás seguro de eliminar este día especial?')) return;
     
     try {
       await deleteSpecialDay(diaEspecialId);
-      toast.success('✅ Día especial eliminado');
+      toast.success('Día especial eliminado');
       loadDiasEspeciales();
     } catch (error) {
       console.error('Error eliminando día especial:', error);

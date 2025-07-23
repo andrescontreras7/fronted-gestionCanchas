@@ -12,7 +12,7 @@ export default function NewBookingPage() {
     return (
       <div className="text-center py-8">
         <h1 className="text-2xl font-bold mb-4">Error</h1>
-        <p>No se especificó una cancha para reservar.</p>
+        <p>No se especifico una cancha para reservar.</p>
       </div>
     )
   }

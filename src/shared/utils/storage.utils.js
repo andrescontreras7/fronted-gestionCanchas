@@ -15,7 +15,7 @@ export const storage = {
       // Guardar en localStorage
       localStorage.setItem(AUTH_TOKEN_KEY, token)
 
-      console.log('Token guardado:', token)
+
       if (typeof document !== 'undefined') {
         document.cookie = `auth_token=${token}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Strict`
       }
@@ -90,7 +90,7 @@ export const storage = {
    */
   setRoleUser(roleData) {
     try {
-      console.log('Guardando rol del usuario:', roleData)
+
       
       let roleName = null
       
@@ -111,7 +111,7 @@ export const storage = {
         if (typeof document !== 'undefined') {
           document.cookie = `user_role=${roleName}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Strict`
         }
-        console.log('Rol guardado correctamente:', roleName)
+
       } else {
         console.warn('No se pudo extraer el rol de:', roleData)
       }
@@ -227,7 +227,7 @@ export const extractRoleFromJWT = (token) => {
     }
 
     const payload = JSON.parse(atob(parts[1]))
-    console.log('Payload del JWT:', payload)
+
 
     // Buscar el rol en diferentes posibles ubicaciones
     const role = payload.role || 
@@ -237,7 +237,7 @@ export const extractRoleFromJWT = (token) => {
                  payload.authorities?.[0] ||
                  'usuario' // rol por defecto
 
-    console.log('Rol extraído del JWT:', role)
+
     return role
   } catch (error) {
     console.error('Error decodificando JWT para extraer rol:', error)
@@ -260,7 +260,7 @@ export const setRoleFromCurrentToken = () => {
     const role = extractRoleFromJWT(token)
     if (role) {
       storage.setUserRole(role)
-      console.log('Rol sincronizado desde token:', role)
+
       return role
     }
 

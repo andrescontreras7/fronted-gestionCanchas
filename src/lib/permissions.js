@@ -1,15 +1,15 @@
-// Definición de permisos del sistema - Exactos de tu BD
+
 export const PERMISSIONS = {
-  // Reservas
+
   CREAR_RESERVAS: 'crear_reservas',
   VER_RESERVAS: 'ver_reservas',
   EDITAR_RESERVAS: 'editar_reservas',
   CANCELAR_RESERVAS: 'cancelar_reservas',
   APROBAR_RESERVAS: 'aprobar_reservas', 
   ELIMINAR_RESERVAS: 'eliminar_reservas', 
-  GESTIONAR_CHECKIN: 'gestionar_checkin', // Nuevo: para check-in/check-out
+  GESTIONAR_CHECKIN: 'gestionar_checkin', 
   
-  // Usuarios
+
   CREAR_USUARIOS: 'crear_usuarios',
   VER_USUARIOS: 'ver_usuarios',
   EDITAR_USUARIOS: 'editar_usuarios',
@@ -44,7 +44,6 @@ export const PERMISSIONS = {
   VER_LOGS: 'ver_logs'
 }
 
-// Grupos de permisos por rol según tu sistema
 export const ROLE_PERMISSIONS = {
   administrador: [
     // Reservas - Control total
@@ -93,7 +92,7 @@ export const ROLE_PERMISSIONS = {
  
   
   usuario: [
-    // Reservas - Solo crear sus propias reservas
+    
     PERMISSIONS.CREAR_RESERVAS,
     PERMISSIONS.VER_RESERVAS,
     
@@ -102,7 +101,7 @@ export const ROLE_PERMISSIONS = {
   ]
 }
 
-// Función helper para verificar permisos
+
 export const checkPermission = (userPermissions, requiredPermission) => {
   if (!userPermissions || !Array.isArray(userPermissions)) {
     return false
@@ -122,12 +121,10 @@ export const checkMultiplePermissions = (userPermissions, requiredPermissions, r
   }
 }
 
-// Función para obtener permisos por rol (útil para testing)
-export const getPermissionsByRole = (role) => {
-  return ROLE_PERMISSIONS[role] || []
-}
 
-// Funciones específicas para verificar permisos comunes
+
+
+
 export const canCreateReservations = (userPermissions) => {
   return checkPermission(userPermissions, PERMISSIONS.CREAR_RESERVAS)
 }
@@ -141,7 +138,7 @@ export const canManageUsers = (userPermissions) => {
     PERMISSIONS.CREAR_USUARIOS,
     PERMISSIONS.EDITAR_USUARIOS,
     PERMISSIONS.ELIMINAR_USUARIOS
-  ], false) // Solo necesita uno de estos permisos
+  ], false) 
 }
 
 export const canManageCourts = (userPermissions) => {

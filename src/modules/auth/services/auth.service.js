@@ -6,7 +6,6 @@ export const authService = {
 
   async login(credentials) {
     const {email, password} = credentials
-    console.log('🚀 Iniciando login para:', email)
     
     const response = await apiCall('/auth/login', {
       method: 'POST',
@@ -16,20 +15,16 @@ export const authService = {
       }),
     })
     
-    console.log('📋 Respuesta del login:', response)
     
     let userData = null
     
     if (response.access_token) {
       storage.setAuthToken(response.access_token)
-      console.log('✅ Token guardado')
       
       try {
         // Obtener datos del usuario después de login exitoso
         userData = await this.verifyRolesByToken()
-        console.log('✅ Roles verificados:', userData)
       } catch (error) {
-        console.log('⚠️ Error al verificar roles, continuando con datos básicos:', error)
         // Continuar sin romper el flujo
       }
     }
@@ -42,15 +37,12 @@ export const authService = {
     }
     
     storage.setUserData(userDataToSave)
-    console.log('✅ UserData guardado:', userDataToSave)
     
     // Solo guardar rol si tenemos userData válido
     if (userData && userData.role) {
       storage.setUserRole(userData.role)
-      console.log('✅ Rol guardado:', userData.role)
     } else {
       // Usar rol por defecto si no se pudo obtener
-      console.log('⚠️ No se pudo obtener rol específico, usando "usuario" por defecto')
       storage.setUserRole('usuario')
     }
 
@@ -77,11 +69,9 @@ export const authService = {
       // Obtener datos del usuario después del registro
       try {
         const userProfile = await this.verifyRolesByToken()
-        console.log('Perfil después del registro:', userProfile)
         
         if (userProfile && userProfile.role) {
           storage.setUserRole(userProfile.role.name)
-          console.log('Rol asignado al nuevo usuario:', userProfile.role.name)
         }
       } catch (error) {
         console.error('Error obteniendo perfil después del registro:', error)
@@ -98,21 +88,17 @@ export const authService = {
   async verifyRolesByToken() {
     try {
       const response = await authenticatedApiCall('/user/profile')
-      console.log('📝 Datos del usuario desde perfil:', response)
 
       if (response && response.role) {
-        console.log('🎯 Rol obtenido:', response.role)
         // Guardar el rol en el storage
         if (response.role.name) {
           storage.setUserRole(response.role.name)
         }
       } else {
-        console.log('⚠️ No se encontró rol en la respuesta del perfil')
       }
 
       return response
     } catch (error) {
-      console.log('❌ Error al verificar roles:', error)
       throw error
     }
   },
@@ -202,7 +188,6 @@ export const authService = {
     })
     
     if (response) {
-     console.log('Permisos del usuario:', response)
     }
     
     return response

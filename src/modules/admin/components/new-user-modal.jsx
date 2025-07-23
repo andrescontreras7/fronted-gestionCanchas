@@ -1,63 +1,84 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { toast } from "sonner"
-import { useAuth } from "@/hooks/api-hooks"
-import { updateUserRole } from "@/lib/server-actions"
+import { memo, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/api-hooks";
+import { updateUserRole } from "@/lib/server-actions";
 
-export function NewUserModal({ isOpen, onClose, roles, onSuccess }) {
-
+export const NewUserModal = memo(({ isOpen, onClose, roles, onSuccess }) => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
     last_name: "",
     role: "",
-  })
-  const { register, isLoading, error } = useAuth()
+  });
+  const { register, isLoading, error } = useAuth();
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
-    if (!formData.username || !formData.email || !formData.password || !formData.last_name || !formData.role) {
-      toast.error("Por favor completa todos los campos")
-      return
+    e.preventDefault();
+
+    if (
+      !formData.username ||
+      !formData.email ||
+      !formData.password ||
+      !formData.last_name ||
+      !formData.role
+    ) {
+      toast.error("Por favor completa todos los campos");
+      return;
     }
 
     try {
-      // Registrar usuario
       const registerData = {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        last_name: formData.last_name
-      }
-      
-      const newUser = await register(registerData, false) // false para que no redirija
-      
-      // Asignar rol al usuario
+        last_name: formData.last_name,
+      };
+
+      const newUser = await register(registerData, false); // false para que no redirija
+
       if (newUser?.user?.id) {
-        await updateUserRole(newUser.user.id, formData.role)
+        await updateUserRole(newUser.user.id, formData.role);
       }
 
-      toast.success("Usuario creado exitosamente")
-      onSuccess?.()
-      onClose()
-      setFormData({ username: "", email: "", password: "", last_name: "", role: "" })
+      toast.success("Usuario creado exitosamente");
+      onSuccess?.();
+      onClose();
+      setFormData({
+        username: "",
+        email: "",
+        password: "",
+        last_name: "",
+        role: "",
+      });
     } catch (error) {
-      toast.error(error.message || "Error al crear usuario")
+      toast.error(error.message || "Error al crear usuario");
     }
-  }
+  };
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -113,7 +134,9 @@ export function NewUserModal({ isOpen, onClose, roles, onSuccess }) {
               <Label htmlFor="role">Rol</Label>
               <Select
                 value={formData.role}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, role: value }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecciona un rol" />
@@ -129,7 +152,12 @@ export function NewUserModal({ isOpen, onClose, roles, onSuccess }) {
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isLoading}
+            >
               Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>
@@ -139,5 +167,5 @@ export function NewUserModal({ isOpen, onClose, roles, onSuccess }) {
         </form>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+});

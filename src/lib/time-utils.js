@@ -9,6 +9,6 @@ export function formatTimeToAMPM(time24) {
     const displayHour = hour12 === 0 ? 12 : hour12 > 12 ? hour12 - 12 : hour12;
     return `${displayHour}:${minutes} ${ampm}`;
   } catch (error) {
-    return time24; // Fallback al formato original
+    return time24; 
   }
 }

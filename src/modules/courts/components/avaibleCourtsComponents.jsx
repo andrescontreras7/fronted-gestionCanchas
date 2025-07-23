@@ -44,7 +44,7 @@ const DisponibilidadCancha = ({ canchaId, onReservar }) => {
     setReservando(true);
 
 
-    const user = JSON.parse(localStorage.getItem('user_data')); // Asumiendo que el usuario está guardado en localStorage
+    const user = JSON.parse(localStorage.getItem('user_data')); 
  
     try {
       await onReservar({
@@ -60,7 +60,7 @@ const DisponibilidadCancha = ({ canchaId, onReservar }) => {
       });
       toast.success("Reserva realizada con éxito");
       setOpen(false);
-      // Recargar disponibilidad
+
       fetchAvailability();
     } catch (error) {
       toast.error(error.message || "Error al realizar la reserva");
@@ -99,7 +99,7 @@ const DisponibilidadCancha = ({ canchaId, onReservar }) => {
         </Button>
       </DialogTrigger>
     <DialogContent className="max-w-[95vw] md:max-w-2xl w-full max-h-[90vh] p-0 flex flex-col overflow-hidden">
-  {/* Header */}
+
   <DialogHeader className="p-6 pb-2 shrink-0">
     <DialogTitle>Calendario de Disponibilidad</DialogTitle>
     <DialogDescription>
@@ -107,7 +107,6 @@ const DisponibilidadCancha = ({ canchaId, onReservar }) => {
     </DialogDescription>
   </DialogHeader>
 
-  {/* Contenido scrollable */}
   <div className="flex-1 overflow-y-auto px-6 space-y-4 pb-6">
     {loading ? (
       <div className="text-center py-4">Cargando disponibilidad...</div>
@@ -115,7 +114,7 @@ const DisponibilidadCancha = ({ canchaId, onReservar }) => {
       <div className="text-center py-4">No hay disponibilidad para esta cancha.</div>
     ) : (
       <>
-        {/* Selector de días */}
+
         <ScrollArea className="w-full">
           <div className="flex gap-2 px-1 pb-2">
             {DIAS_ORDENADOS.map(dia => (

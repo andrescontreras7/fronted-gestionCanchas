@@ -1,136 +1,129 @@
-// ============================================
-// 🎣 HOOKS REORGANIZADOS (Solo estado y UI)
-// ============================================
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { 
-  clientAuthService, 
-  clientUsersService, 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  clientAuthService,
+  clientUsersService,
   clientPermissionsService,
-  handleClientError 
-} from '@/services/client-api.service'
-import { storage } from '@/shared/utils/storage.utils'
-import { toast } from "sonner"
-import { PERMISSIONS } from '@/lib/permissions'
-
-// ============================================
-// 🔐 AUTH HOOK
-// ============================================
+  handleClientError,
+} from "@/services/client-api.service";
+import { storage } from "@/shared/utils/storage.utils";
+import { toast } from "sonner";
+import { PERMISSIONS } from "@/lib/permissions";
 
 export function useAuth() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const router = useRouter();
 
   const redirectByRole = (role) => {
     switch (role) {
-      case 'administrador':
-        router.push('/admin/dashboard')
-        break
-      case 'gerente':
-        router.push('/gerente/dashboard')
-        break
-      case 'empleado':
-        router.push('/empleado/dashboard')
-        break
-      case 'usuario':
+      case "administrador":
+        router.push("/admin/dashboard");
+        break;
+      case "gerente":
+        router.push("/gerente/dashboard");
+        break;
+      case "empleado":
+        router.push("/empleado/dashboard");
+        break;
+      case "usuario":
       default:
-        router.push('/user/dashboard')
+        router.push("/user/dashboard");
     }
-  }
+  };
 
   const login = async (credentials) => {
-    setIsLoading(true)
-    setError(null)
-    
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const response = await clientAuthService.login(credentials)
-      const role = storage.getUserRole()
-      redirectByRole(role)
-      return response
+      const response = await clientAuthService.login(credentials);
+      const role = storage.getUserRole();
+      redirectByRole(role);
+      return response;
     } catch (err) {
-      const errorMessage = handleClientError(err)
-      setError(errorMessage)
-      throw err
+      const errorMessage = handleClientError(err);
+      setError(errorMessage);
+      throw err;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const register = async (userData, shouldRedirect = true) => {
-    setIsLoading(true)
-    setError(null)
-    
-    try {
-      const response = await clientAuthService.register(userData)
-      
-      // Mostrar mensaje de éxito
-      toast.success(shouldRedirect 
-        ? "Registro exitoso. Por favor inicia sesión" 
-        : "Usuario creado exitosamente")
+    setIsLoading(true);
+    setError(null);
 
-      // Solo redirige si shouldRedirect es true (registro normal de usuarios)
+    try {
+      const response = await clientAuthService.register(userData);
+
+      toast.success(
+        shouldRedirect
+          ? "Registro exitoso. Por favor inicia sesión"
+          : "Usuario creado exitosamente"
+      );
+
       if (shouldRedirect) {
-        router.push('/login')
+        router.push("/");
       }
-      
-      return response
+
+      return response;
     } catch (err) {
-      const errorMessage = handleClientError(err)
-      setError(errorMessage)
-      toast.error(errorMessage || "Error al registrar usuario")
-      throw err
+      const errorMessage = handleClientError(err);
+      setError(errorMessage);
+      toast.error(errorMessage || "Error al registrar usuario");
+      throw err;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const logout = async () => {
-    setIsLoading(true)
-    
+    setIsLoading(true);
+
     try {
-      await clientAuthService.logout()
-      router.push('/')
+      await clientAuthService.logout();
+      router.push("/");
     } catch (err) {
-      console.error('Error durante logout:', err)
+      console.error("Error durante logout:", err);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const updateProfile = async (profileData) => {
-    setIsLoading(true)
-    setError(null)
-    
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const response = await clientAuthService.updateProfile(profileData)
-      return response
+      const response = await clientAuthService.updateProfile(profileData);
+      return response;
     } catch (err) {
-      const errorMessage = handleClientError(err)
-      setError(errorMessage)
-      throw err
+      const errorMessage = handleClientError(err);
+      setError(errorMessage);
+      throw err;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const changePassword = async (passwordData) => {
-    setIsLoading(true)
-    setError(null)
-    
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const response = await clientAuthService.changePassword(passwordData)
-      return response
+      const response = await clientAuthService.changePassword(passwordData);
+      return response;
     } catch (err) {
-      const errorMessage = handleClientError(err)
-      setError(errorMessage)
-      throw err
+      const errorMessage = handleClientError(err);
+      setError(errorMessage);
+      throw err;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return {
     isLoading,
@@ -140,95 +133,97 @@ export function useAuth() {
     logout,
     updateProfile,
     changePassword,
-    clearError: () => setError(null)
-  }
+    clearError: () => setError(null),
+  };
 }
 
-// ============================================
-// 👥 USERS HOOK (Cliente)
-// ============================================
-
 export function useUsers() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [users, setUsers] = useState([])
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [users, setUsers] = useState([]);
 
   const fetchUsers = async () => {
-    setIsLoading(true)
-    setError(null)
-    
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const response = await clientUsersService.getAllUsers()
-      setUsers(response.users || response)
-      return response
+      const response = await clientUsersService.getAllUsers();
+      setUsers(response.users || response);
+      return response;
     } catch (err) {
-      const errorMessage = handleClientError(err)
-      setError(errorMessage)
-      throw err
+      const errorMessage = handleClientError(err);
+      setError(errorMessage);
+      throw err;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const updateUser = async (userId, userData) => {
-    setIsLoading(true)
-    setError(null)
-    
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const response = await clientUsersService.updateUser(userId, userData)
-    
-      setUsers(prev => prev.map(user => 
-        user.id === userId ? { ...user, ...userData } : user
-      ))
-      return response
+      const response = await clientUsersService.updateUser(userId, userData);
+
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === userId ? { ...user, ...userData } : user
+        )
+      );
+      return response;
     } catch (err) {
-      const errorMessage = handleClientError(err)
-      setError(errorMessage)
-      throw err
+      const errorMessage = handleClientError(err);
+      setError(errorMessage);
+      throw err;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const deactivateUser = async (userId) => {
-    setIsLoading(true)
-    setError(null)
-    
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const response = await clientUsersService.deactivateUser(userId)
-   
-      setUsers(prev => prev.map(user => 
-        user.id === userId ? { ...user, is_active: false } : user
-      ))
-      return response
+      const response = await clientUsersService.deactivateUser(userId);
+
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === userId ? { ...user, is_active: false } : user
+        )
+      );
+      return response;
     } catch (err) {
-      const errorMessage = handleClientError(err)
-      setError(errorMessage)
-      throw err
+      const errorMessage = handleClientError(err);
+      setError(errorMessage);
+      throw err;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const activateUser = async (userId) => {
-    setIsLoading(true)
-    setError(null)
-    
-    try {
-      const response = await clientUsersService.activateUser(userId)
+    setIsLoading(true);
+    setError(null);
 
-      setUsers(prev => prev.map(user => 
-        user.id === userId ? { ...user, is_active: true } : user
-      ))
-      return response
+    try {
+      const response = await clientUsersService.activateUser(userId);
+
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === userId ? { ...user, is_active: true } : user
+        )
+      );
+      return response;
     } catch (err) {
-      const errorMessage = handleClientError(err)
-      setError(errorMessage)
-      throw err
+      const errorMessage = handleClientError(err);
+      setError(errorMessage);
+      throw err;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return {
     isLoading,
@@ -238,181 +233,176 @@ export function useUsers() {
     updateUser,
     deactivateUser,
     activateUser,
-    clearError: () => setError(null)
-  }
+    clearError: () => setError(null),
+  };
 }
 
-// ============================================
-// 🔑 PERMISSIONS HOOK
-// ============================================
-
 export function usePermissions() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [permissions, setPermissions] = useState([])
-  const [allPermissions, setAllPermissions] = useState([]) // Lista completa de permisos
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [permissions, setPermissions] = useState([]);
+  const [allPermissions, setAllPermissions] = useState([]); // Lista completa de permisos
 
   const fetchMyPermissions = async () => {
-    setIsLoading(true)
-    setError(null)
-    
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const response = await clientPermissionsService.getMyPermissions()
-      setPermissions(response.permissions || response)
-      return response
+      const response = await clientPermissionsService.getMyPermissions();
+      setPermissions(response.permissions || response);
+      return response;
     } catch (err) {
-      const errorMessage = handleClientError(err)
-      setError(errorMessage)
-      throw err
+      const errorMessage = handleClientError(err);
+      setError(errorMessage);
+      throw err;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const fetchUserPermissions = async (userId) => {
-    setIsLoading(true)
-    setError(null)
-    
+    setIsLoading(true);
+    setError(null);
+
     try {
-      console.log('🔍 Obteniendo permisos completos para usuario:', userId)
-      const response = await clientPermissionsService.getUserPermissions(userId)
-      console.log('📦 Respuesta permisos usuario:', response)
-      
-      // Manejar diferentes formatos de respuesta del backend
-      let userPermissions = []
-      
+      console.log("🔍 Obteniendo permisos completos para usuario:", userId);
+      const response = await clientPermissionsService.getUserPermissions(
+        userId
+      );
+      let userPermissions = [];
+
       if (Array.isArray(response)) {
-        userPermissions = response
-      } else if (response && typeof response === 'object') {
-        // Intentar diferentes propiedades que podría usar el backend
-        userPermissions = response.permissions || 
-                         response.all_permissions || 
-                         response.user_permissions || 
-                         response.data || 
-                         []
+        userPermissions = response;
+      } else if (response && typeof response === "object") {
+        userPermissions =
+          response.permissions ||
+          response.all_permissions ||
+          response.user_permissions ||
+          response.data ||
+          [];
       }
-      
-      // Validar que todos los elementos sean strings válidos
-      const validPermissions = Array.isArray(userPermissions) 
-        ? userPermissions.filter(p => p && typeof p === 'string' && p.trim().length > 0)
-        : []
-      
-      console.log('✅ Permisos procesados:', validPermissions)
-      return validPermissions
-      
+
+      const validPermissions = Array.isArray(userPermissions)
+        ? userPermissions.filter(
+            (p) => p && typeof p === "string" && p.trim().length > 0
+          )
+        : [];
+      return validPermissions;
     } catch (err) {
-      const errorMessage = handleClientError(err)
-      setError(errorMessage)
-      console.error('❌ Error obteniendo permisos del usuario:', err)
-      return []
+      const errorMessage = handleClientError(err);
+      setError(errorMessage);
+      console.error(" Error obteniendo permisos del usuario:", err);
+      return [];
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const fetchAllPermissions = async () => {
-    setIsLoading(true)
-    setError(null)
-    
+    setIsLoading(true);
+    setError(null);
+
     try {
-      console.log('🔍 Obteniendo lista completa de permisos')
-      const response = await clientPermissionsService.getAllPermissions()
-      console.log('📋 Lista de permisos:', response)
-      
+      console.log("🔍 Obteniendo lista completa de permisos");
+      const response = await clientPermissionsService.getAllPermissions();
+      console.log("📋 Lista de permisos:", response);
+
       // Tu endpoint devuelve un array de objetos con {name, description, uid}
-      let permissionsList = []
-      
+      let permissionsList = [];
+
       if (Array.isArray(response)) {
-        permissionsList = response
-      } else if (response && typeof response === 'object') {
-        // Intentar diferentes propiedades que podría usar el backend
-        permissionsList = response.permissions || 
-                         response.data || 
-                         response.results || 
-                         []
+        permissionsList = response;
+      } else if (response && typeof response === "object") {
+        permissionsList =
+          response.permissions || response.data || response.results || [];
       }
-      
-      // Validar que todos los elementos sean objetos válidos con name
-      const validPermissions = Array.isArray(permissionsList) 
-        ? permissionsList.filter(p => {
-            return p && typeof p === 'object' && p.name && typeof p.name === 'string'
+      const validPermissions = Array.isArray(permissionsList)
+        ? permissionsList.filter((p) => {
+            return (
+              p && typeof p === "object" && p.name && typeof p.name === "string"
+            );
           })
-        : []
-      
-      console.log('✅ Lista de permisos procesada:', validPermissions.length, 'permisos válidos')
-      setAllPermissions(validPermissions)
-      return validPermissions
-      
+        : [];
+
+      setAllPermissions(validPermissions);
+      return validPermissions;
     } catch (err) {
-      const errorMessage = handleClientError(err)
-      setError(errorMessage)
-      console.error('❌ Error obteniendo lista de permisos:', err)
+      const errorMessage = handleClientError(err);
+      setError(errorMessage);
+      console.error("❌ Error obteniendo lista de permisos:", err);
       // Fallback a constantes locales
-      const fallbackPermissions = Object.values(PERMISSIONS).map(p => ({
+      const fallbackPermissions = Object.values(PERMISSIONS).map((p) => ({
         name: p,
-        description: '',
-        uid: p
-      }))
-      setAllPermissions(fallbackPermissions)
-      return fallbackPermissions
+        description: "",
+        uid: p,
+      }));
+      setAllPermissions(fallbackPermissions);
+      return fallbackPermissions;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const updateUserPermissions = async (userId, newPermissions) => {
-    setIsLoading(true)
-    setError(null)
-    
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const response = await clientPermissionsService.updateUserPermissions(userId, newPermissions)
-      return response
+      const response = await clientPermissionsService.updateUserPermissions(
+        userId,
+        newPermissions
+      );
+      return response;
     } catch (err) {
-      const errorMessage = handleClientError(err)
-      setError(errorMessage)
-      throw err
+      const errorMessage = handleClientError(err);
+      setError(errorMessage);
+      throw err;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const assignPermission = async (userId, permissionName) => {
-    setIsLoading(true)
-    setError(null)
-    
+    setIsLoading(true);
+    setError(null);
+
     try {
-      console.log('➕ Asignando permiso:', permissionName, 'a usuario:', userId)
-      const response = await clientPermissionsService.assignPermissionToUser(userId, permissionName)
-      console.log('✅ Permiso asignado:', response)
-      return response
+      const response = await clientPermissionsService.assignPermissionToUser(
+        userId,
+        permissionName
+      );
+
+      return response;
     } catch (err) {
-      const errorMessage = handleClientError(err)
-      setError(errorMessage)
-      console.error('❌ Error asignando permiso:', err)
-      throw err
+      const errorMessage = handleClientError(err);
+      setError(errorMessage);
+      console.error(" Error asignando permiso:", err);
+      throw err;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const revokePermission = async (userId, permissionName) => {
-    setIsLoading(true)
-    setError(null)
-    
+    setIsLoading(true);
+    setError(null);
+
     try {
-      console.log('➖ Revocando permiso:', permissionName, 'de usuario:', userId)
-      const response = await clientPermissionsService.revokePermissionFromUser(userId, permissionName)
-      console.log('✅ Permiso revocado:', response)
-      return response
+      const response = await clientPermissionsService.revokePermissionFromUser(
+        userId,
+        permissionName
+      );
+  
+      return response;
     } catch (err) {
-      const errorMessage = handleClientError(err)
-      setError(errorMessage)
-      console.error('❌ Error revocando permiso:', err)
-      throw err
+      const errorMessage = handleClientError(err);
+      setError(errorMessage);
+      console.error("❌ Error revocando permiso:", err);
+      throw err;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return {
     isLoading,
@@ -425,20 +415,20 @@ export function usePermissions() {
     updateUserPermissions,
     assignPermission,
     revokePermission,
-    clearError: () => setError(null)
-  }
+    clearError: () => setError(null),
+  };
 }
 
-
 export function useUIState() {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [profileModalOpen, setProfileModalOpen] = useState(false)
-  const [currentTheme, setCurrentTheme] = useState('light')
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState("light");
 
-  const toggleSidebar = () => setSidebarOpen(prev => !prev)
-  const openProfileModal = () => setProfileModalOpen(true)
-  const closeProfileModal = () => setProfileModalOpen(false)
-  const toggleTheme = () => setCurrentTheme(prev => prev === 'light' ? 'dark' : 'light')
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
+  const openProfileModal = () => setProfileModalOpen(true);
+  const closeProfileModal = () => setProfileModalOpen(false);
+  const toggleTheme = () =>
+    setCurrentTheme((prev) => (prev === "light" ? "dark" : "light"));
 
   return {
     sidebarOpen,
@@ -448,6 +438,6 @@ export function useUIState() {
     openProfileModal,
     closeProfileModal,
     currentTheme,
-    toggleTheme
-  }
+    toggleTheme,
+  };
 }

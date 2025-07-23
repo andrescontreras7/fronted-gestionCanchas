@@ -52,7 +52,9 @@ async function getSpecificUserPermissions(userId) {
   });
 
   if (!response.ok) {
-    throw new Error(`Error al obtener permisos del usuario: ${response.statusText}`);
+    throw new Error(
+      `Error al obtener permisos del usuario: ${response.statusText}`
+    );
   }
 
   const data = await response.json();
@@ -80,7 +82,9 @@ async function getAllPermissions() {
   });
 
   if (!response.ok) {
-    throw new Error(`Error al obtener lista de permisos: ${response.statusText}`);
+    throw new Error(
+      `Error al obtener lista de permisos: ${response.statusText}`
+    );
   }
 
   const data = await response.json();
@@ -107,13 +111,15 @@ async function assignPermissionToUser(userId, permissionName) {
     },
     body: JSON.stringify({
       user_id: userId,
-      permission_names: [permissionName]
+      permission_names: [permissionName],
     }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Error asignando permiso: ${response.statusText} - ${errorText}`);
+    throw new Error(
+      `Error asignando permiso: ${response.statusText} - ${errorText}`
+    );
   }
 
   const data = await response.json();
@@ -142,7 +148,9 @@ async function revokePermissionFromUser(userId, permissionName) {
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Error revocando permiso: ${response.statusText} - ${errorText}`);
+    throw new Error(
+      `Error revocando permiso: ${response.statusText} - ${errorText}`
+    );
   }
 
   const data = await response.json();
@@ -185,9 +193,8 @@ async function getUsers() {
   }
 }
 
-
- async function createBooking(bookingData) {
- const cookieStore = await cookies();
+async function createBooking(bookingData) {
+  const cookieStore = await cookies();
   const token = cookieStore.get("auth_token")?.value;
 
   if (!token) {
@@ -209,15 +216,17 @@ async function getUsers() {
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Error al crear reserva: ${response.statusText} - ${errorText}`);
+    throw new Error(
+      `Error al crear reserva: ${response.statusText} - ${errorText}`
+    );
   }
 
   const result = await response.json();
-  
+
   // Revalidar las rutas relacionadas con reservas
-  revalidatePath('/user/bookings');
-  revalidatePath('/admin/bookings');
-  
+  revalidatePath("/user/bookings");
+  revalidatePath("/admin/bookings");
+
   return result;
 }
 
@@ -382,12 +391,13 @@ async function getAvailabilityCourts(courtId) {
   });
 
   if (!response.ok) {
-    throw new Error(`Error al obtener la disponibilidad de la cancha: ${response.statusText}`);
+    throw new Error(
+      `Error al obtener la disponibilidad de la cancha: ${response.statusText}`
+    );
   }
 
   return response.json();
 }
-
 
 async function getDetailsBooking(bookingId) {
   const cookieStore = await cookies();
@@ -617,7 +627,9 @@ async function getRecentActivity() {
   });
 
   if (!response.ok) {
-    throw new Error(`Error al obtener actividad reciente: ${response.statusText}`);
+    throw new Error(
+      `Error al obtener actividad reciente: ${response.statusText}`
+    );
   }
 
   return response.json();
@@ -633,7 +645,9 @@ async function getUserDashboardStats(userId) {
 
   const API_BASE_URL =
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
-  const url = `${API_BASE_URL}/user/dashboard/stats${userId ? `?user_id=${userId}` : ''}`;
+  const url = `${API_BASE_URL}/user/dashboard/stats${
+    userId ? `?user_id=${userId}` : ""
+  }`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -644,13 +658,15 @@ async function getUserDashboardStats(userId) {
   });
 
   if (!response.ok) {
-    throw new Error(`Error al obtener estadísticas del usuario: ${response.statusText}`);
+    throw new Error(
+      `Error al obtener estadísticas del usuario: ${response.statusText}`
+    );
   }
 
   return response.json();
 }
 
-async function cancelBooking(bookingId, reason = '') {
+async function cancelBooking(bookingId, reason = "") {
   const cookieStore = await cookies();
   const token = cookieStore.get("auth_token")?.value;
 
@@ -673,16 +689,17 @@ async function cancelBooking(bookingId, reason = '') {
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Error al cancelar reserva: ${response.statusText} - ${errorText}`);
+    throw new Error(
+      `Error al cancelar reserva: ${response.statusText} - ${errorText}`
+    );
   }
 
   const result = await response.json();
-  
-  // Revalidar las rutas relacionadas con reservas
-  revalidatePath('/user/bookings');
-  revalidatePath('/admin/bookings');
+
+  revalidatePath("/user/bookings");
+  revalidatePath("/admin/bookings");
   revalidatePath(`/admin/bookings/${bookingId}`);
-  
+
   return result;
 }
 
@@ -709,16 +726,18 @@ async function updateBookingStatus(bookingId, newStatus) {
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Error al actualizar estado: ${response.statusText} - ${errorText}`);
+    throw new Error(
+      `Error al actualizar estado: ${response.statusText} - ${errorText}`
+    );
   }
 
   const result = await response.json();
-  
+
   // Revalidar las rutas relacionadas con reservas
-  revalidatePath('/user/bookings');
-  revalidatePath('/admin/bookings');
+  revalidatePath("/user/bookings");
+  revalidatePath("/admin/bookings");
   revalidatePath(`/admin/bookings/${bookingId}`);
-  
+
   return result;
 }
 
@@ -758,8 +777,6 @@ async function updateUserData(userId, userData) {
     throw error;
   }
 }
-
-
 
 export {
   getUsers,

@@ -20,7 +20,7 @@ export async function apiCall(endpoint, options = {}) {
   try {
     const response = await fetch(url, config)
     
-    console.log('📥 Respuesta recibida:', {
+
       status: response.status,
       statusText: response.statusText,
       ok: response.ok
@@ -32,7 +32,7 @@ export async function apiCall(endpoint, options = {}) {
     }
 
     const data = await response.json()
-    console.log('✅ Datos recibidos:', data)
+
     return data
   } catch (error) {
      throw new Error(' API Error:', error)
@@ -63,8 +63,8 @@ export async function authenticatedApiCall(endpoint, options = {}) {
 
 export const usersAuthService = {
   async getAllUsers() {
-    console.log('🔍 getAllUsers - Iniciando...')
-    console.log('🌍 Entorno:', typeof window !== 'undefined' ? 'CLIENTE' : 'SERVIDOR')
+
+
     
     try {
 
@@ -75,7 +75,7 @@ export const usersAuthService = {
         },
       })
       
-      console.log('✅ Usuarios obtenidos:', response)
+
       return response
     } catch (error) {
       console.error(' Error en:', error)
@@ -87,7 +87,7 @@ export const usersAuthService = {
     const response = await authenticatedApiCall(`/admin/users/${userId}`, {
       method: 'GET',
     })
-    console.log('Usuario obtenido:', response)
+
     return response
   },
 
@@ -99,7 +99,7 @@ export const usersAuthService = {
       },
       body: JSON.stringify(userData),
     })
-    console.log('Usuario actualizado:', response)
+
     return response
   },
 
@@ -107,7 +107,7 @@ export const usersAuthService = {
     const response = await authenticatedApiCall(`/admin/users/${userId}/deactivate`, {
       method: 'PUT',
     })
-    console.log('Usuario desactivado:', response)
+
     return response
   },
 
@@ -115,7 +115,7 @@ export const usersAuthService = {
     const response = await authenticatedApiCall(`/admin/users/${userId}/activate`, {
       method: 'PUT',
     })
-    console.log('Usuario activado:', response)
+
     return response
   }
 }
@@ -124,10 +124,10 @@ export const usersAuthService = {
 
 export async function authenticatedServerApiCall(endpoint, options = {}, cookieStore) {
   const token = cookieStore.get('auth_token')?.value
-  console.log('🔑 Token obtenido de cookies:', token ? 'Token presente' : 'No hay token')
+
   
   if (!token) {
-    console.log(' No hay token disponible en cookies')
+
     return null
   }
   

@@ -158,7 +158,7 @@ function EmpleadoProfileContent({ userData }) {
   )
 }
 
-// Componente para perfil de Usuario
+
 function UsuarioProfileContent({ userData }) {
   return (
     <div className="space-y-6">
